@@ -10,7 +10,8 @@ class Post extends Admin
     public function index()
     {
         $db = new DataBase();
-        $posts = $db->select("SELECT * FROM posts");
+        // include comments_count for each post so the view can disable comment button when there are no comments
+        $posts = $db->select("SELECT posts.*, (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comments_count FROM posts");
         require_once BASE_PATH . '/template/admin/post/index.php';
     }
 

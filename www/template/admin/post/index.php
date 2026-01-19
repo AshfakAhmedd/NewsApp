@@ -76,7 +76,10 @@
                         </a>
                         <hr class="my-1" />
                         <a role="button" class="btn btn-sm btn-primary text-white" href="<?= url('admin/post/edit/' . $post['id']) ?>">edit</a>
-                <a role="button" class="btn btn-sm btn-danger text-white" href="<?= url('admin/post/delete/' . $post['id']) ?>">delete</a>
+                        <a role="button" class="btn btn-sm btn-danger text-white" href="<?= url('admin/post/delete/' . $post['id']) ?>">delete</a>
+                    <?php if (!empty($post['comments_count']) && $post['comments_count'] > 0) { ?>
+                        <a role="button" class="btn btn-sm btn-info text-white btn-comment" href="<?= url('admin/comment') . '?post_id=' . $post['id'] ?>">comment</a>
+                    <?php } ?>
                 </td>
                 </tr>
 
@@ -93,3 +96,53 @@
 require_once (BASE_PATH . '/template/admin/layouts/footer.php')
 
 ?>
+
+<!-- Comments modal -->
+<div class="modal fade" id="commentsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Comments</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="commentsModalBody">
+                <div class="text-center text-muted">Loading...</div>
+            </div>
+            <div class="modal-footer">
+                <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+        var modalEl = document.getElementById('commentsModal');
+        var modalBody = document.getElementById('commentsModalBody');
+        var bsModal = null;
+        if (typeof bootstrap !== 'undefined' && modalEl) {
+                bsModal = new bootstrap.Modal(modalEl);
+        }
+
+        document.querySelectorAll('.btn-comment').forEach(function(el){
+                el.addEventListener('click', function(e){
+                        e.preventDefault();
+                        var href = el.getAttribute('href') || '';
+                        if (href.indexOf('?') === -1) href += '?ajax=1'; else href += '&ajax=1';
+                        modalBody.innerHTML = '<div class="text-center text-muted">Loading...</div>';
+                        fetch(href, { credentials: 'same-origin' })
+                                .then(function(res){ return res.text(); })
+                                .then(function(html){
+                                        modalBody.innerHTML = html;
+                                        if (bsModal) bsModal.show();
+                                })
+                                .catch(function(err){
+                                        modalBody.innerHTML = '<div class="text-danger">Failed to load comments.</div>';
+                                        if (bsModal) bsModal.show();
+                                });
+                });
+        });
+});
+</script>
