@@ -25,16 +25,21 @@
                 <td><?= htmlspecialchars($comment['email']) ?></td>
                 <td><?= htmlspecialchars($comment['post_title']) ?></td>
                 <td><?= htmlspecialchars($comment['comment']) ?></td>
-                <td><?= htmlspecialchars($comment['status']) ?></td>
+                <td id="comment_row_<?= $comment['id'] ?>"><?= htmlspecialchars($comment['status']) ?></td>
                 <td>
-                    <?php if ($comment['status'] == 'seen') { ?>
-                    <a role="button" class="btn btn-sm btn-success text-white" href="<?= url('admin/comment/change-status/' . $comment['id']) ?>">click to approved</a>
-                    <?php } else { ?>
-                    <a role="button" class="btn btn-sm btn-warning text-white" href="<?= url('admin/comment/change-status/' . $comment['id']) ?>">click not to approved</a>
-                    <?php } ?>
+                 <button
+                        type="button"
+                        class="btn btn-sm text-white comment-status-btn <?= $comment['status'] == 'seen' ? 'btn-success' : 'btn-warning' ?>"
+                        data-id="<?= $comment['id'] ?>"
+                        data-status="<?= $comment['status'] ?>"
+                    >
+                        <?= $comment['status'] == 'seen' ? 'Click to approve' : 'Click not to approve' ?>
+                    </button>
+
                 </td>
             </tr>
             <?php } ?>
         </tbody>
     </table>
 </section>
+

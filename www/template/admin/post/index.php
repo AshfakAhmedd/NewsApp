@@ -144,5 +144,61 @@ document.addEventListener('DOMContentLoaded', function(){
                                 });
                 });
         });
+
+
+document.addEventListener('click', function (e) {
+     if (!e.target.classList.contains('comment-status-btn')) return;
+       const button = e.target;
+    const commentId = button.dataset.id;
+    const currentStatus = button.dataset.status;
+    const url = "<?= url('admin/comment/change-status/') ?>/" + commentId;
+    const statusTd = document.querySelector("#comment_row_" + commentId);
+   
+
+    button.disabled = true;
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.message || 'Failed');
+            return;
+        }
+
+        if (data.status === 'seen') {
+            button.className = 'btn btn-sm btn-success text-white comment-status-btn';
+            button.textContent = 'Click to approve';
+            button.dataset.status = 'approved';
+            statusTd.textContent = 'seen';
+        } else {
+            button.className = 'btn btn-sm btn-warning text-white comment-status-btn';
+            button.textContent = 'Click not to approve';
+            button.dataset.status = 'seen';
+            statusTd.textContent = 'approved';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Request failed');
+    })
+    .finally(() => {
+        button.disabled = false;
+    });
+});
 });
 </script>
+
+
+
+
+<script>
+
+          
+</script>
+
+

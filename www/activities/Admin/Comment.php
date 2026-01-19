@@ -40,21 +40,40 @@ class Comment extends Admin{
 
         public function changeStatus($id)
         {
-                $db = new DataBase();
-                $comment = $db->select('SELECT * FROM comments WHERE id = ?;', [$id])->fetch();
-                if(empty($comment)){
-                        $this->redirectBack();  
-                }
-                if($comment['status'] == 'seen'){
-                        $db->update('comments', $id, ['status'], ['approved']);
-                }
-                else{
-                        $db->update('comments', $id, ['status'], ['seen']);
-                }
-                $this->redirectBack();
+        header('Content-Type: application/json');
+
+        $db = new DataBase();
+        $comment = $db->select(
+                'SELECT * FROM comments WHERE id = ?;',
+                [$id]
+        )->fetch();
+
+        if (empty($comment)) {
+                http_response_code(404);
+                echo json_encode([
+                'success' => false,
+                'message' => 'Comment not found'
+                ]);
+                exit;
         }
 
-     
-     
+        // Toggle status
+        if ($comment['status'] === 'seen') {
+                $db->update('comments', $id, ['status'], ['approved']);
+                $newStatus = 'approved';
+        } else {
+                $db->update('comments', $id, ['status'], ['seen']);
+                $newStatus = 'seen';
+        }
+
+        // ✅ SUCCESS RESPONSE (HTTP 200)
+        http_response_code(200);
+        echo json_encode([
+                'success' => true,
+                'status'  => $newStatus
+        ]);
+        exit;
+        }
+
 
 }
